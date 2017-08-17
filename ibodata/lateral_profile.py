@@ -1,4 +1,4 @@
-from beprof import Profile
+from beprof.profile import Profile
 
 
 class LateralProfile(Profile):
