@@ -37,15 +37,13 @@ init:
 install:
 # tell miniconda to always follow default answers
   - conda config --set always_yes yes --set changeps1 no
-# update miniconda
-  - conda update -q conda
 # create new conda workspace and activate it
   - conda create -q --name python%PYTHON_VERSION% python=%PYTHON_VERSION%
   - activate python%PYTHON_VERSION%
 # as scipy and classic wxpython doesn't yet have wheels for windows, install it using conda
   - conda install -q --name python%PYTHON_VERSION% numpy
 # install usual requirements
-  - pip install --upgrade -r requirements.txt
+  - pip install -r requirements.txt
 # check numpy & scipy versions
   - python -c "import numpy as np;print(np.version.version)"
 # check python version
