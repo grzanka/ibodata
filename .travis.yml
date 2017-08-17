@@ -44,7 +44,7 @@ sudo: false
 dist: trusty
 
 install:
-- pip install tests/requirements-test.txt
+- pip install -r tests/requirements-test.txt
 
 script:
 - tox --notest && tox
