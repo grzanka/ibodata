@@ -24,8 +24,6 @@ matrix:
     env: TOXENV=py36
   - python: nightly
     env: TOXENV=py37
-  - python: 3.4
-    env: TOXENV=docs
   - python: 2.7
     env: TOXENV=pep8
   - python: 3.4
@@ -39,12 +37,12 @@ matrix:
     env: TOXENV=py37
 
 # travis-ci runs by default on ancient Ubuntu 12.04 (precise)
-# following options will give us Ubuntu 14.04 (trusty)
+# following options will give us Ubuntu 14.04 (trusty) running in container infrastructure
 sudo: false
 dist: trusty
 
 install:
-- pip install -r tests/requirements-test.txt
+- pip install --upgrade virtualenv$VENVVER pip$PIPVER setuptools$STVER tox wheel
 
 script:
-- tox --notest && tox
+- tox --notest && travis_retry tox -- -n 8
