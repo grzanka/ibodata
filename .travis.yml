@@ -45,4 +45,4 @@ install:
 - pip install --upgrade virtualenv$VENVVER pip$PIPVER setuptools$STVER tox wheel
 
 script:
-- tox --notest && travis_retry tox -- -n 8
+- tox --notest && travis_retry tox --
