@@ -1,0 +1,14 @@
+  include *.rst
+  include *.txt
+  include *.py
+  include LICENSE
+  include requirements.txt
+  include tests/requirements-test.txt
+  recursive-include ibodata *.py
+  recursive-include tests *.py
+
+  exclude .gitkeep
+  exclude .gitconfig
+  exclude tox.ini
+  exclude .travis.yml
+  exclude appveyor.yml
