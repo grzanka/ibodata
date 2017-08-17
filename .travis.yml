@@ -40,11 +40,11 @@ matrix:
 
 # travis-ci runs by default on ancient Ubuntu 12.04 (precise)
 # following options will give us Ubuntu 14.04 (trusty)
-sudo: required
+sudo: false
 dist: trusty
 
-#install:
-#- ./.travis/install_linux.sh
+install:
+- pip install tests/requirements-test.txt
 
 script:
-- tox --notest && travis_retry tox -- -n 8
+- tox --notest && tox
