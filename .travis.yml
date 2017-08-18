@@ -27,8 +27,6 @@ matrix:
   - python: 3.5
     env: TOXENV=packaging
   allow_failures:
-  - python: 3.2
-    env: TOXENV=py32 VENVVER="<14.0.0" PIPVER="<8.0.0" STVER="<30.0.0"
   - python: nightly
     env: TOXENV=py37
 
