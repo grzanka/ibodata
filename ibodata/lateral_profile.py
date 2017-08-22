@@ -1,14 +1,23 @@
-import numpy as np
 import math
+
+import numpy as np
 
 from beprof.profile import Profile
 
 
 class LateralProfile(Profile):
     def penumbra_left(self):
+        """
+        In case of good data returns positive number
+        In case of corrupted data returns nan
+        """
         return self.x_at_y(0.1, True)-self.x_at_y(0.9, True)
 
     def penumbra_right(self):
+        """
+        In case of good data returns positive number
+        In case of corrupted data returns nan
+        """
         return self.x_at_y(0.9)-self.x_at_y(0.1)
 
     def field_ratio(self, level):
@@ -60,4 +69,7 @@ class LateralProfile(Profile):
         self.y /= ave
 
     def absolute_y(self):
+        """
+        Translate y to bring y.min() to 0 (removes noise)
+        """
         self.y = self.y - self.y.min()
