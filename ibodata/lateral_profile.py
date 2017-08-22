@@ -56,8 +56,11 @@ class LateralProfile(Profile):
 
     def normalize(self, dt):
         """
-        Normalize to 1 over [-dt, +dt] area from the mid of the profile
+        Translate y to bring y.min() to 0 (noise substraction) and then
+        normalize to 1 over [-dt, +dt] area from the mid of the profile
         """
+        self.y -= self.y.min()
+
         a = self.y.max() - self.y.min()
         a /= 2.0
         w = self.width(a)
@@ -67,9 +70,3 @@ class LateralProfile(Profile):
         ave = np.average(self.y[np.fabs(self.x) <= dt])
 
         self.y /= ave
-
-    def absolute_y(self):
-        """
-        Translate y to bring y.min() to 0 (noise substraction)
-        """
-        self.y -= self.y.min()
