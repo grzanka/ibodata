@@ -36,7 +36,7 @@ class LateralProfile(Profile):
         p_max = np.max(self.y[np.logical_and(self.x <= right, self.x >= left)])
         p_min = np.min(self.y[np.logical_and(self.x <= right, self.x >= left)])
 
-        return ((p_max-p_min) / (p_max+p_min)) * 100.0
+        return ((p_max - p_min) / (p_max + p_min)) * 100.0
 
     def flatness_90(self):
         d = (self.penumbra_left() + self.penumbra_right()) / 2
