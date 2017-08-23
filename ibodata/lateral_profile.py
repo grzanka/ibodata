@@ -54,6 +54,7 @@ class LateralProfile(Profile):
 
         return ((area_left - area_right) / (area_left + area_right)) * 100.0
 
+
     def normalize(self, dt, allow_cast=True):
         """
         Translate y to bring y.min() to 0 (noise substraction) and then
@@ -68,6 +69,7 @@ class LateralProfile(Profile):
         self.x -= mid
 
         ave = np.average(self.y[np.fabs(self.x) <= dt])
+
 
         if allow_cast:
             self.y = self.y / ave
