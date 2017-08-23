@@ -6,14 +6,14 @@ from beprof.profile import Profile
 
 
 class LateralProfile(Profile):
-    def penumbra_left(self):
+    def penumbra_right(self):
         """
         In case of good data returns positive number
         In case of corrupted data returns nan
         """
         return self.x_at_y(0.1, True) - self.x_at_y(0.9, True)
 
-    def penumbra_right(self):
+    def penumbra_left(self):
         """
         In case of good data returns positive number
         In case of corrupted data returns nan
@@ -54,7 +54,7 @@ class LateralProfile(Profile):
 
         return ((area_left - area_right) / (area_left + area_right)) * 100.0
 
-    def normalize(self, dt):
+    def normalize(self, dt, allow_cast=True):
         """
         Translate y to bring y.min() to 0 (noise substraction) and then
         normalize to 1 over [-dt, +dt] area from the mid of the profile
@@ -69,4 +69,7 @@ class LateralProfile(Profile):
 
         ave = np.average(self.y[np.fabs(self.x) <= dt])
 
-        self.y /= ave
+        if allow_cast:
+            self.y = self.y / ave
+        else:
+            self.y /= ave
