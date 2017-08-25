@@ -5,19 +5,20 @@ from beprof.profile import Profile
 
 class DepthProfile(Profile):
 
-    def range(self, level):
-        return self.width(level)
-
-    def FWHM(self):
+    def fwhm(self):
         return self.width(0.5)
 
     def max_plat_ratio(self):
-        return self.y.max()/self.y[self.x.min()]
+        return self.y.max() / self.y[0]
 
     def distal_falloff(self):
         return self.x_at_y(0.1, True) - self.x_at_y(0.9, True)
 
     def modulation(self, level):
+        """
+        if there's not y equal level from left x_at_y() returns NaN.
+        In that case instead of taking x_at_y(level), this function takes first x
+        """
         if np.isnan(self.x_at_y(level)):
             return self.x_at_y(level, True) - self.x[0]
         else:
