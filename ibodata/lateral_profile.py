@@ -21,15 +21,25 @@ class LateralProfile(Profile):
         return self.x_at_y(0.9) - self.x_at_y(0.1)
 
     def field_ratio(self, level):
+        """
+        In case of good data returns positive number
+        In case of corrupted data returns nan
+        """
         return self.width(level) / self.width(0.5)
 
     def symmetry(self, level):
+        """
+        In case of good data returns positive number
+        In case of corrupted data returns nan
+        """
         a = math.fabs(self.x_at_y(level, False))
         b = math.fabs(self.x_at_y(level, True))
         return (math.fabs(a - b) / (a + b)) * 200.0
 
     def flatness_50(self):
         d = (self.penumbra_left() + self.penumbra_right()) / 2
+        if d == np.nan:
+            return np.nan
         left = self.x_at_y(0.5) + 2.0 * d
         right = self.x_at_y(0.5, True) - 2.0 * d
 
@@ -40,6 +50,8 @@ class LateralProfile(Profile):
 
     def flatness_90(self):
         d = (self.penumbra_left() + self.penumbra_right()) / 2
+        if d == np.nan:
+            return np.nan
         left = self.x_at_y(0.9) + d
         right = self.x_at_y(0.9, True) - d
 
@@ -64,6 +76,8 @@ class LateralProfile(Profile):
         a = self.y.max() - self.y.min()
         a /= 2.0
         w = self.width(a)
+        if w == np.nan:
+            raise ValueError("Part of profile is missing.")
         mid = self.x_at_y(a) + w / 2.0
         self.x -= mid
 
