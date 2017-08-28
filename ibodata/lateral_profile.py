@@ -76,7 +76,7 @@ class LateralProfile(Profile):
         a = self.y.max() - self.y.min()
         a /= 2.0
         w = self.width(a)
-        if w == np.nan:
+        if w != w:
             raise ValueError("Part of profile is missing.")
         mid = self.x_at_y(a) + w / 2.0
         self.x -= mid
