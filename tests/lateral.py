@@ -56,11 +56,10 @@ class TestLateralParameters(unittest.TestCase):
         data3: profile that's only decreasing
         """
         self.data1 = LateralProfile([[0, 0], [10, 19], [20, 29]])
-        self.data2 = LateralProfile([[-2.25, 0], [-0.25, 1.25], [0.75, 1.25], [1.75, 2]])
+        self.data2 = LateralProfile([[-2.25, 0], [-0.25, 1.25], [0.75, 1.25], [1.75, 0]])
         self.data3 = LateralProfile([[-1.5, 4], [0.5, 2], [1.5, 0]])
 
     def test_penumbras(self):
-        self.data2 = LateralProfile([[-2.25, 0], [-0.25, 1.25], [0.75, 1.25], [1.75, 0]])
         self.assertAlmostEqual(self.data2.penumbra_left(), 1.28)
         self.assertAlmostEqual(self.data1.penumbra_left(), 0.42105263)
         self.assertTrue(np.isnan(self.data3.penumbra_left()))
@@ -87,8 +86,6 @@ class TestLateralParameters(unittest.TestCase):
 
         self.assertTrue(np.isnan(self.data3.field_ratio(1)))
         self.assertTrue(np.isnan(self.data3.field_ratio(0.95)))
-        with self.assertRaises(ValueError):
-            self.data3.field_ratio(0)
 
     def test_symmetry(self):
         self.assertTrue(np.isnan(self.data1.symmetry(1)))
