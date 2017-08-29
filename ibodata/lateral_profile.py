@@ -23,48 +23,79 @@ class LateralProfile(Profile):
     def field_ratio(self, level):
         """
         In case of good data returns positive number
+        Level has to be >= 0.0 and <= 1 or exception is raised
         In case of corrupted data returns nan
         """
+        if level < 0.0 or level > 1.0:
+            raise ValueError("Expected level to be between 0.0 and 1.0")
         return self.width(level) / self.width(0.5)
 
     def symmetry(self, level):
         """
         In case of good data returns positive number
+        Level has to be >= 0 and <= 1 or exception is raised
         In case of corrupted data returns nan
         """
+        if level < 0 or level > 1.0:
+            raise ValueError("Expected level to be between 0 and 1")
         a = math.fabs(self.x_at_y(level, False))
         b = math.fabs(self.x_at_y(level, True))
         return (math.fabs(a - b) / (a + b)) * 200.0
 
     def flatness_50(self):
+        """
+        In case of corrupted data returns nan
+        Returns value between points if max/min value occurs on border
+        """
         d = (self.penumbra_left() + self.penumbra_right()) / 2
-        if d == np.nan:
+        if d != d:
             return np.nan
         left = self.x_at_y(0.5) + 2.0 * d
         right = self.x_at_y(0.5, True) - 2.0 * d
 
-        p_max = np.max(self.y[np.logical_and(self.x <= right, self.x >= left)])
-        p_min = np.min(self.y[np.logical_and(self.x <= right, self.x >= left)])
+        p_max = np.max(
+            np.append(self.y[np.logical_and(self.x <= right, self.x >= left)], [self.y_at_x(right), self.y_at_x(left)]))
+        p_min = np.min(
+            np.append(self.y[np.logical_and(self.x <= right, self.x >= left)], [self.y_at_x(right), self.y_at_x(left)]))
 
         return ((p_max - p_min) / (p_max + p_min)) * 100.0
 
     def flatness_90(self):
+        """
+        In case of corrupted data returns nan
+        Returns value between points if max/min value occurs on border
+        """
         d = (self.penumbra_left() + self.penumbra_right()) / 2
-        if d == np.nan:
+        if d != d:
             return np.nan
         left = self.x_at_y(0.9) + d
         right = self.x_at_y(0.9, True) - d
 
-        p_max = np.max(self.y[np.logical_and(self.x <= right, self.x >= left)])
-        p_min = np.min(self.y[np.logical_and(self.x <= right, self.x >= left)])
+        p_max = np.max(
+            np.append(self.y[np.logical_and(self.x <= right, self.x >= left)], [self.y_at_x(right), self.y_at_x(left)]))
+        p_min = np.min(
+            np.append(self.y[np.logical_and(self.x <= right, self.x >= left)], [self.y_at_x(right), self.y_at_x(left)]))
 
         return ((p_max - p_min) / (p_max + p_min)) * 100.0
 
     def asymmetry(self):
+        """
+        In case of corrupted data returns nan
+        Add area between mid and the nearest points if there's no 0 value in self.x
+        """
         area_left = np.trapz(self.y[self.x <= 0], self.x[self.x <= 0])
         area_right = np.trapz(self.y[self.x >= 0], self.x[self.x >= 0])
 
-        return ((area_left - area_right) / (area_left + area_right)) * 100.0
+        if np.argwhere(self.x == 0).size == 0:
+            left_index_arr = np.argwhere(self.x < 0)
+            area_left += np.trapz(np.append(self.y[left_index_arr[left_index_arr.size-1]], self.y_at_x(0)),
+                                  np.append(self.x[left_index_arr[left_index_arr.size-1]], [.0]))
+
+            right_index_arr = np.argwhere(self.x > 0)
+            area_right += np.trapz(np.append(self.y_at_x(0), self.y[right_index_arr[0]]),
+                                  np.append([.0], self.x[right_index_arr[0]]))
+
+        return float(((area_left - area_right) / (area_left + area_right)) * 100.0)
 
     def normalize(self, dt, allow_cast=True):
         """
