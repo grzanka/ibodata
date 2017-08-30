@@ -8,21 +8,21 @@ from beprof.profile import Profile
 class LateralProfile(Profile):
     def penumbra_right(self):
         """
-        In case of good data returns float
+        In case of good data returns floating-point number
         In case of corrupted data returns nan
         """
         return self.x_at_y(0.1, True) - self.x_at_y(0.9, True)
 
     def penumbra_left(self):
         """
-        In case of good data returns float
+        In case of good data returns floating-point number
         In case of corrupted data returns nan
         """
         return self.x_at_y(0.9) - self.x_at_y(0.1)
 
     def field_ratio(self, level):
         """
-        In case of good data returns float
+        In case of good data returns floating-point number
         Level has to be >= 0.0 and <= 1 or exception is raised
         In case of corrupted data returns nan
         """
@@ -32,7 +32,7 @@ class LateralProfile(Profile):
 
     def symmetry(self, level):
         """
-        In case of good data returns float
+        In case of good data returns floating-point number
         Level has to be >= 0 and <= 1 or exception is raised
         In case of corrupted data returns nan
         """
@@ -44,7 +44,7 @@ class LateralProfile(Profile):
 
     def flatness_50(self):
         """
-        Returns float
+        Returns floating-point number
         In case of corrupted data returns nan
         Returns value between points if max/min value occurs on border
         """
@@ -63,7 +63,7 @@ class LateralProfile(Profile):
 
     def flatness_90(self):
         """
-        Returns float
+        Returns floating-point number
         In case of corrupted data returns nan
         Returns value between points if max/min value occurs on border
         """
@@ -92,12 +92,12 @@ class LateralProfile(Profile):
 
         if np.argwhere(self.x == 0).size == 0:
             left_index_arr = np.argwhere(self.x < 0)
-            area_left += np.trapz(np.append(self.y[left_index_arr[left_index_arr.size-1]], self.y_at_x(0)),
-                                  np.append(self.x[left_index_arr[left_index_arr.size-1]], [.0]))
+            area_left += np.trapz(np.append(self.y[left_index_arr[left_index_arr.size - 1]], self.y_at_x(0)),
+                                  np.append(self.x[left_index_arr[left_index_arr.size - 1]], [.0]))
 
             right_index_arr = np.argwhere(self.x > 0)
             area_right += np.trapz(np.append(self.y_at_x(0), self.y[right_index_arr[0]]),
-                                  np.append([.0], self.x[right_index_arr[0]]))
+                                   np.append([.0], self.x[right_index_arr[0]]))
 
         result = ((area_left - area_right) / (area_left + area_right)) * 100.0
 
