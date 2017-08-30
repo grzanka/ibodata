@@ -5,8 +5,8 @@ from beprof.profile import Profile
 
 class DepthProfile(Profile):
 
-    def fwhm(self):
-        return self.width(0.5)
+    def ran(self, level=0.9):
+        return self.x_at_y(level, True)
 
     def max_plat_ratio(self):
         return self.y.max() / self.y[0]
