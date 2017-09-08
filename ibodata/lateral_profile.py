@@ -120,7 +120,19 @@ class LateralProfile(Profile):
         mid = self.x_at_y(a) + w / 2.0
         self.x -= mid
 
-        ave = np.average(self.y[np.fabs(self.x) <= dt])
+        slice_y = self.y[np.fabs(self.x) <= dt]
+        slice_x = self.x[np.fabs(self.x) <= dt]
+
+        if np.argwhere(self.x == -dt).size == 0:
+            slice_y = np.append(slice_y, self.y_at_x(dt))
+            slice_x = np.append(slice_x, dt)
+
+        if np.argwhere(self.x == dt).size == 0:
+            slice_y = np.append(self.y_at_x(-dt), slice_y)
+            slice_x = np.append(-dt, slice_x)
+
+        area = np.trapz(slice_y, slice_x)
+        ave = area / (2.0 * dt)
 
         if allow_cast:
             self.y = self.y / ave
