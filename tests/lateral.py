@@ -125,5 +125,6 @@ class TestLateralParameters(unittest.TestCase):
         self.assertAlmostEqual(self.data2.asymmetry(), 0.0)
         self.assertAlmostEqual(self.data3.asymmetry(), 39.28571428)
 
+
 if __name__ == '__main__':
     unittest.main()
