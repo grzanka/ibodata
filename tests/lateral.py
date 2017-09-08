@@ -45,7 +45,10 @@ class TestLateralNormalize(unittest.TestCase):
         self.data2.normalize(1)
 
         self.assertTrue(np.array_equal(self.data2.x, [-2.25, -0.25, 0.75, 1.75]))
-        self.assertTrue(np.array_equal(self.data2.y, [0, 1.25, 1.25, 0]))
+        self.assertAlmostEqual(self.data2.y[0], 0.0)
+        self.assertAlmostEqual(self.data2.y[1], 1.09401709)
+        self.assertAlmostEqual(self.data2.y[2], 1.09401709)
+        self.assertAlmostEqual(self.data2.y[3], 0.0)
 
 
 class TestLateralParameters(unittest.TestCase):
@@ -60,13 +63,13 @@ class TestLateralParameters(unittest.TestCase):
         self.data3 = LateralProfile([[-1.5, 4], [0.5, 2], [1.5, 0]])
 
     def test_penumbras(self):
-        self.assertEqual(self.data2.penumbra_left(), 1.28)
+        self.assertAlmostEqual(self.data2.penumbra_left(), 1.28)
         self.assertAlmostEqual(self.data1.penumbra_left(), 0.42105263)
         self.assertTrue(np.isnan(self.data3.penumbra_left()))
 
-        self.assertEqual(self.data2.penumbra_right(), 0.64)
+        self.assertAlmostEqual(self.data2.penumbra_right(), 0.64)
         self.assertTrue(np.isnan(self.data1.penumbra_right()))
-        self.assertEqual(self.data3.penumbra_right(), 0.4)
+        self.assertAlmostEqual(self.data3.penumbra_right(), 0.4)
 
     def test_field_ratio(self):
         self.assertTrue(np.isnan(self.data1.field_ratio(1)))
@@ -77,10 +80,10 @@ class TestLateralParameters(unittest.TestCase):
         self.assertAlmostEqual(self.data2.field_ratio(1.0), 0.57142857)
         self.assertAlmostEqual(self.data2.field_ratio(0.9), 0.65714285)
         self.assertAlmostEqual(self.data2.field_ratio(0.95), 0.61428571)
-        self.assertEqual(self.data2.field_ratio(0.5), 1.0)
+        self.assertAlmostEqual(self.data2.field_ratio(0.5), 1.0)
 
         with self.assertRaises(ValueError):
-            self.data2.field_ratio(-1)
+            self.data2.field_ratio(-1.0)
         with self.assertRaises(ValueError):
             self.data2.field_ratio(1.2)
 
@@ -93,7 +96,7 @@ class TestLateralParameters(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.data1.symmetry(-3)
 
-        self.assertEqual(self.data2.symmetry(1.0), 37.5)
+        self.assertAlmostEqual(self.data2.symmetry(1.0), 37.5)
         self.assertAlmostEqual(self.data2.symmetry(0.95), 30.23255813)
         self.assertAlmostEqual(self.data2.symmetry(0.9), 23.91304347)
         self.assertAlmostEqual(self.data2.symmetry(0.5), 7.14285714)
@@ -118,8 +121,8 @@ class TestLateralParameters(unittest.TestCase):
         self.assertTrue(np.isnan(self.data3.flatness_50()))
 
     def test_asymmetry(self):
-        self.assertEqual(self.data1.asymmetry(), -100.0)
-        self.assertEqual(self.data2.asymmetry(), 0)
+        self.assertAlmostEqual(self.data1.asymmetry(), -100.0)
+        self.assertAlmostEqual(self.data2.asymmetry(), 0.0)
         self.assertAlmostEqual(self.data3.asymmetry(), 39.28571428)
 
 if __name__ == '__main__':
