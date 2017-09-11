@@ -120,23 +120,25 @@ class LateralProfile(Profile):
         mid = self.x_at_y(a) + w / 2.0
         self.x -= mid
 
-        slice_y = self.y[np.fabs(self.x) <= dt]
-        slice_x = self.x[np.fabs(self.x) <= dt]
+        norm_section_y = self.y[np.fabs(self.x) <= dt]
+        norm_section_x = self.x[np.fabs(self.x) <= dt]
+        area = np.trapz(norm_section_y, norm_section_x)
 
         """
-        if there's no point on the edge normalization is not perfectly accurate 
+        if there's no point on the edge normalization is not perfectly accurate
         and we are normalizing over smaller area than [-dt, +dt]
         That's why we interpolate points on the edge below.
         """
         if np.argwhere(self.x == -dt).size == 0:
-            slice_y = np.append(slice_y, self.y_at_x(dt))
-            slice_x = np.append(slice_x, dt)
+            coords_y = (self.y_at_x(-dt), norm_section_y[0])
+            coords_x = (-dt, norm_section_x[0])
+            area += np.trapz(coords_y, coords_x)
 
         if np.argwhere(self.x == dt).size == 0:
-            slice_y = np.append(self.y_at_x(-dt), slice_y)
-            slice_x = np.append(-dt, slice_x)
+            coords_y = (norm_section_y[len(norm_section_y)-1], self.y_at_x(dt))
+            coords_x = (norm_section_x[len(norm_section_x)-1], dt)
+            area += np.trapz(coords_y, coords_x)
 
-        area = np.trapz(slice_y, slice_x)
         ave = area / (2.0 * dt)
 
         if allow_cast:
