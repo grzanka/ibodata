@@ -87,17 +87,17 @@ class LateralProfile(Profile):
         Add area between mid and the nearest points if there's no 0 value in self.x
         area_left and area_right are DataSet and it propagates to result so it has to be converted to float
         """
-        area_left = np.trapz(self.y[self.x <= 0], self.x[self.x <= 0])
-        area_right = np.trapz(self.y[self.x >= 0], self.x[self.x >= 0])
+        area_left = np.trapz(x=self.x[self.x <= 0], y=self.y[self.x <= 0])
+        area_right = np.trapz(x=self.x[self.x >= 0], y=self.y[self.x >= 0])
 
         if np.argwhere(self.x == 0).size == 0:
             left_index_arr = np.argwhere(self.x < 0)
-            area_left += np.trapz(np.append(self.y[left_index_arr[left_index_arr.size - 1]], self.y_at_x(0)),
-                                  np.append(self.x[left_index_arr[left_index_arr.size - 1]], [.0]))
+            area_left += np.trapz(x=np.append(self.x[left_index_arr[left_index_arr.size - 1]], [.0]),
+                                  y=np.append(self.y[left_index_arr[left_index_arr.size - 1]], self.y_at_x(0)))
 
             right_index_arr = np.argwhere(self.x > 0)
-            area_right += np.trapz(np.append(self.y_at_x(0), self.y[right_index_arr[0]]),
-                                   np.append([.0], self.x[right_index_arr[0]]))
+            area_right += np.trapz(x=np.append([.0], self.x[right_index_arr[0]]),
+                                   y=np.append(self.y_at_x(0), self.y[right_index_arr[0]]))
 
         result = ((area_left - area_right) / (area_left + area_right)) * 100.0
 
@@ -133,7 +133,7 @@ class LateralProfile(Profile):
 
         norm_section_y = self.y[np.fabs(self.x) <= dt]
         norm_section_x = self.x[np.fabs(self.x) <= dt]
-        area = np.trapz(norm_section_y, norm_section_x)
+        area = np.trapz(x=norm_section_x, y=norm_section_y)
 
         """
         if there's no point on the edge normalization is not perfectly accurate
@@ -143,12 +143,12 @@ class LateralProfile(Profile):
         if np.argwhere(self.x == -dt).size == 0:
             coords_y = (self.y_at_x(-dt), norm_section_y[0])
             coords_x = (-dt, norm_section_x[0])
-            area += np.trapz(coords_y, coords_x)
+            area += np.trapz(x=coords_x, y=coords_y)
 
         if np.argwhere(self.x == dt).size == 0:
             coords_y = (norm_section_y[len(norm_section_y) - 1], self.y_at_x(dt))
             coords_x = (norm_section_x[len(norm_section_x) - 1], dt)
-            area += np.trapz(coords_y, coords_x)
+            area += np.trapz(x=coords_x, y=coords_y)
 
         ave = area / (2.0 * dt)
 
