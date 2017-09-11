@@ -135,8 +135,8 @@ class LateralProfile(Profile):
             area += np.trapz(coords_y, coords_x)
 
         if np.argwhere(self.x == dt).size == 0:
-            coords_y = (norm_section_y[len(norm_section_y)-1], self.y_at_x(dt))
-            coords_x = (norm_section_x[len(norm_section_x)-1], dt)
+            coords_y = (norm_section_y[len(norm_section_y) - 1], self.y_at_x(dt))
+            coords_x = (norm_section_x[len(norm_section_x) - 1], dt)
             area += np.trapz(coords_y, coords_x)
 
         ave = area / (2.0 * dt)
