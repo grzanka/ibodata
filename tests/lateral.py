@@ -36,6 +36,7 @@ class TestLateralNormalize(unittest.TestCase):
         self.data2 = LateralProfile([[-3, 4], [-1, 8], [0, 8], [1, 4]])
         self.data3 = LateralProfile([[-1.5, 5], [0.5, 3], [1.5, 1]])
         self.data4 = LateralProfile([[-3, 5], [-1, 8], [0, 8], [1, 4]], dtype=np.int)
+        self.data5 = LateralProfile([[-3, 4], [-1, 8], [0, 8], [1, 4]])
 
     def test_normalize(self):
         with self.assertRaises(ValueError):
@@ -57,6 +58,14 @@ class TestLateralNormalize(unittest.TestCase):
 
         self.assertTrue(np.array_equal(self.data4.x, [-2, 0, 0, 1]))
         self.assertTrue(np.array_equal(self.data4.y, [0, 1, 1, 0]))
+
+        self.data5.normalize(1, False)
+
+        self.assertTrue(np.array_equal(self.data5.x, [-2.25, -0.25, 0.75, 1.75]))
+        self.assertAlmostEqual(self.data5.y[0], 0.0)
+        self.assertAlmostEqual(self.data5.y[1], 1.09401709)
+        self.assertAlmostEqual(self.data5.y[2], 1.09401709)
+        self.assertAlmostEqual(self.data5.y[3], 0.0)
 
 
 class TestLateralParameters(unittest.TestCase):
