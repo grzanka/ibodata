@@ -55,11 +55,8 @@ class TestLateralNormalize(unittest.TestCase):
 
         self.data4.normalize(1)
 
-        self.assertTrue(np.array_equal(self.data4.x, [-2.25, -0.25, 0.75, 1.75]))
-        self.assertAlmostEqual(self.data4.y[0], 0.0)
-        self.assertAlmostEqual(self.data4.y[1], 1.09401709)
-        self.assertAlmostEqual(self.data4.y[2], 1.09401709)
-        self.assertAlmostEqual(self.data4.y[3], 0.0)
+        self.assertTrue(np.array_equal(self.data4.x, [-2, 0, 0, 1]))
+        self.assertTrue(np.array_equal(self.data4.y, [0, 1, 1, 0]))
 
 
 class TestLateralParameters(unittest.TestCase):
