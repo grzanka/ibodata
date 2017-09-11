@@ -109,16 +109,27 @@ class LateralProfile(Profile):
         In case of corrupted data raises ValueError
         Translate y to bring y.min() to 0 (noise substraction) and then
         normalize to 1 over [-dt, +dt] area from the mid of the profile
+        if allow_cast is set to True, division not in place and casting may occur.
+        If division in place is not possible and allow_cast is False
+        an exception is raised.
         """
+        try:
+            self.y /= 1.0
+        except TypeError:
+            if not allow_cast:
+                raise TypeError("Division in place is not possible and casting is not allowed")
+
         self.y -= self.y.min()
 
-        a = self.y.max() - self.y.min()
-        a /= 2.0
+        a = self.y.max() / 2.0
         w = self.width(a)
         if np.isnan(w):
             raise ValueError("Part of profile is missing.")
         mid = self.x_at_y(a) + w / 2.0
-        self.x -= mid
+        if allow_cast:
+            self.x = self.x - mid
+        else:
+            self.x -= mid
 
         norm_section_y = self.y[np.fabs(self.x) <= dt]
         norm_section_x = self.x[np.fabs(self.x) <= dt]
