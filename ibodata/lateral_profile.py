@@ -123,6 +123,11 @@ class LateralProfile(Profile):
         slice_y = self.y[np.fabs(self.x) <= dt]
         slice_x = self.x[np.fabs(self.x) <= dt]
 
+        """
+        if there's no point on the edge normalization is not perfectly accurate 
+        and we are normalizing over smaller area than [-dt, +dt]
+        That's why we interpolate points on the edge below.
+        """
         if np.argwhere(self.x == -dt).size == 0:
             slice_y = np.append(slice_y, self.y_at_x(dt))
             slice_x = np.append(slice_x, dt)
