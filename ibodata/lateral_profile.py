@@ -85,23 +85,23 @@ class LateralProfile(Profile):
         If everything is fine returns float
         In case of corrupted data returns nan
         Add area between mid and the nearest points if there's no 0 value in self.x
-        area_left and area_right are DataSet and it propagates to result so it has to be converted to float
+        np.trapz() in some cases returns DataSet and sometimes it returns float.
+        To avoid problems with types return values from np.trapz() has to be converted to float
         """
-        area_left = np.trapz(self.y[self.x <= 0], self.x[self.x <= 0])
-        area_right = np.trapz(self.y[self.x >= 0], self.x[self.x >= 0])
+        area_left = float(np.trapz(x=self.x[self.x <= 0], y=self.y[self.x <= 0]))
+        area_right = float(np.trapz(x=self.x[self.x >= 0], y=self.y[self.x >= 0]))
 
         if np.argwhere(self.x == 0).size == 0:
             left_index_arr = np.argwhere(self.x < 0)
-            area_left += np.trapz(np.append(self.y[left_index_arr[left_index_arr.size - 1]], self.y_at_x(0)),
-                                  np.append(self.x[left_index_arr[left_index_arr.size - 1]], [.0]))
+            area_left += float(np.trapz(x=(self.x[left_index_arr[-1]], .0),
+                                        y=(self.y[left_index_arr[-1]], self.y_at_x(0))))
 
             right_index_arr = np.argwhere(self.x > 0)
-            area_right += np.trapz(np.append(self.y_at_x(0), self.y[right_index_arr[0]]),
-                                   np.append([.0], self.x[right_index_arr[0]]))
+            area_right += float(np.trapz(x=(.0, self.x[right_index_arr[0]]),
+                                         y=(self.y_at_x(0), self.y[right_index_arr[0]])))
 
         result = ((area_left - area_right) / (area_left + area_right)) * 100.0
-
-        return float(result)
+        return result
 
     def normalize(self, dt, allow_cast=True):
         """
@@ -109,18 +109,54 @@ class LateralProfile(Profile):
         In case of corrupted data raises ValueError
         Translate y to bring y.min() to 0 (noise substraction) and then
         normalize to 1 over [-dt, +dt] area from the mid of the profile
+        if allow_cast is set to True, division not in place and casting may occur.
+        If division in place is not possible and allow_cast is False
+        an exception is raised.
         """
+
+        # check if division is possible
+        # If self.y is float, then nothing happens.
+        # In case it has integers type will stay the same,
+        # but casting may occur
+        try:
+            self.y /= 1.0
+        except TypeError:
+            if not allow_cast:
+                raise TypeError("Division in place is not possible and casting is not allowed")
+
         self.y -= self.y.min()
 
-        a = self.y.max() - self.y.min()
-        a /= 2.0
+        a = self.y.max() / 2.0
         w = self.width(a)
         if np.isnan(w):
             raise ValueError("Part of profile is missing.")
         mid = self.x_at_y(a) + w / 2.0
-        self.x -= mid
+        # type of mid is float so if self.x is made of integers we can't use subtraction in place
+        if allow_cast:
+            self.x = self.x - mid
+        else:
+            self.x -= mid
 
-        ave = np.average(self.y[np.fabs(self.x) <= dt])
+        norm_section_y = self.y[np.fabs(self.x) <= dt]
+        norm_section_x = self.x[np.fabs(self.x) <= dt]
+        area = np.trapz(x=norm_section_x, y=norm_section_y)
+
+        """
+        if there's no point on the edge normalization is not perfectly accurate
+        and we are normalizing over smaller area than [-dt, +dt]
+        That's why we interpolate points on the edge below.
+        """
+        if np.argwhere(self.x == -dt).size == 0:
+            coords_y = (self.y_at_x(-dt), norm_section_y[0])
+            coords_x = (-dt, norm_section_x[0])
+            area += np.trapz(x=coords_x, y=coords_y)
+
+        if np.argwhere(self.x == dt).size == 0:
+            coords_y = (norm_section_y[-1], self.y_at_x(dt))
+            coords_x = (norm_section_x[-1], dt)
+            area += np.trapz(x=coords_x, y=coords_y)
+
+        ave = area / (2.0 * dt)
 
         if allow_cast:
             self.y = self.y / ave
