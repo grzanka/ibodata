@@ -7,6 +7,31 @@ from ibodata.lateral_profile import LateralProfile
 from ibodata.depth_profile import DepthProfile
 
 
+def remove_incorrect_values(array_x_y):
+    """
+    Remove rows with incorrect values, such as Inf, -Inf, NaN, from given array
+    :param array_x_y: 2D array with 2 columns
+    :return: array without incorrect values
+    """
+    ret = np.asarray([array_x_y[:, 0][np.isfinite(array_x_y[:, -1])],
+                      array_x_y[:, -1][np.isfinite(array_x_y[:, -1])]]).transpose()
+    return ret
+
+
+def identify_profile_type(axis):
+    """
+    :param axis: name of axis
+    :return: 'L' for LateralProfile, 'D' for DepthProfile
+    :raises: Exception if couldn't identify profile type
+    """
+    if axis == 'PB' or axis == 'Z':
+        return 'D'
+    elif axis == 'X' or axis == 'Y':
+        return 'L'
+
+    raise Exception("Can't identify profile type")
+
+
 def get_axis(cvs_file_data):
     """
     :param cvs_file_data: data from file with named axis
@@ -26,13 +51,19 @@ def get_axis(cvs_file_data):
         raise Exception("Cannot find axis, candidates: " + str(axis_candidate_list))
 
 
+class ProfileDataset:
+    def __init__(self, profile, date):
+        self.profile = profile
+        self.date = date
+
+
 class FileReader:
     def __init__(self, source):
         """
         :param source: directory path which will be searched
         """
-        self.list_of_Lprofiles = list()
-        self.list_of_Dprofiles = list()
+        self.Lprofiles = list()
+        self.Dprofiles = list()
 
         for dirname, dirnames, filenames in os.walk(source):
             for filename in filenames:
@@ -63,30 +94,14 @@ class FileReader:
                     # extract array with relevant columns from file's data
                     array_x_y = np.asarray((file_data[axis], file_data['Wylicz'])).transpose()
                     # remove rows with Inf, -Inf and NaN
-                    array_x_y = self.remove_incorrect_values(array_x_y)
+                    array_x_y = remove_incorrect_values(array_x_y)
 
                     # Construct Profiles and add them to lists
-                    profile_type = self.identify_profile_type(array_x_y)
+                    profile_type = identify_profile_type(axis)
                     if profile_type == 'L':
-                        self.list_of_Lprofiles.append(LateralProfile(array_x_y))
+                        self.Lprofiles.append(ProfileDataset(LateralProfile(array_x_y), date))
                     elif profile_type == 'D':
-                        self.list_of_Dprofiles.append(DepthProfile(array_x_y))
+                        self.Dprofiles.append(ProfileDataset(DepthProfile(array_x_y), date))
 
-    def remove_incorrect_values(self, array_x_y):
-        """
-        Remove rows with incorrect values, such as Inf, -Inf, NaN, from given array
-        :param array_x_y: 2D array with 2 columns
-        :return: array without incorrect values
-        """
-        ret = np.asarray([array_x_y[:, 0][np.isfinite(array_x_y[:, -1])],
-                          array_x_y[:, -1][np.isfinite(array_x_y[:, -1])]]).transpose()
-        return ret
-
-    def identify_profile_type(self, array):
-        """
-        :param array: 2D array which is either Lateral or Depth Profile, but not yet recognized
-        :return: 'L' for LateralProfile, 'D' for DepthProfile
-        """
-        # TODO
-
-        return 'L'
+        self.Lprofiles = np.asarray(self.Lprofiles)
+        self.Dprofiles = np.asarray(self.Dprofiles)
