@@ -69,14 +69,14 @@ class FileReader:
             for filename in filenames:
 
                 # find file with .dat extension
-                if filename[-4:] == '.dat':
+                if filename.endswith('.dat'):
 
                     # extract date from directory name
-                    split = dirname.split('\\')
+                    split = os.path.split(dirname)
                     date = datetime.strptime(split[-1], '%Y-%m-%d_%H_%M_%S')
 
                     # get data from the file
-                    file_data = np.genfromtxt(dirname + '\\' + filename, dtype=float, names=True)
+                    file_data = np.genfromtxt(os.path.join(dirname, filename), dtype=float, names=True)
 
                     axis = None
                     try:
