@@ -76,19 +76,18 @@ class FileReader:
                     date = datetime.strptime(split[-1], '%Y-%m-%d_%H_%M_%S')
 
                     # get data from the file
-                    file_data = np.genfromtxt(os.path.join(dirname, filename), dtype=float, names=True)
+                    try:
+                        file_data = np.genfromtxt(os.path.join(dirname, filename), dtype=float, names=True)
+                    except ValueError:
+                        continue
 
                     axis = None
                     try:
                         axis = get_axis(file_data)
                     except Exception as e:
-                        print("Profile in file: " + str(os.path.join(dirname, filename)) +
-                              ": " + str(e))
                         continue
 
                     if not np.isin('Wylicz', file_data.dtype.names):
-                        print("Profile in file: " + str(os.path.join(dirname, filename)) +
-                              ": no 'Wylicz.' column found")
                         continue
 
                     # extract array with relevant columns from file's data
