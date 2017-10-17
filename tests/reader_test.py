@@ -62,4 +62,3 @@ class TestReaderCorruptedData(unittest.TestCase):
         self.assertTrue(
             np.array_equal(self.file_reader.Lprofiles[0].profile.y, [0.00045, 0.0005,
                                                                      0.0008, 0.001, 0.0012]))
-

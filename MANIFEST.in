@@ -6,6 +6,8 @@
   include tests/requirements-test.txt
   recursive-include ibodata *.py
   recursive-include tests *.py
+  recursive-include tests *.dat
+  recursive-include tests *.data
 
   exclude .gitkeep
   exclude .gitconfig

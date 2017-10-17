@@ -84,7 +84,7 @@ class FileReader:
                     axis = None
                     try:
                         axis = get_axis(file_data)
-                    except Exception as e:
+                    except Exception:
                         continue
 
                     if not np.isin('Wylicz', file_data.dtype.names):
